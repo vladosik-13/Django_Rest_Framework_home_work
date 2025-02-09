@@ -8,10 +8,14 @@ class Course(models.Model):
         help_text="Введите название курса",
     )
     preview = models.ImageField(
-        upload_to="lms/course_preview", verbose_name="Превью курса"
+        upload_to="lms/course_preview", verbose_name="Превью курса",
+        blank=True,
+        null=True,
     )
     description = models.TextField(
-        verbose_name="Описание", help_text="Введите описание курса"
+        verbose_name="Описание", help_text="Введите описание курса",
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
