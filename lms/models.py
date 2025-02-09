@@ -8,12 +8,14 @@ class Course(models.Model):
         help_text="Введите название курса",
     )
     preview = models.ImageField(
-        upload_to="lms/course_preview", verbose_name="Превью курса",
+        upload_to="lms/course_preview",
+        verbose_name="Превью курса",
         blank=True,
         null=True,
     )
     description = models.TextField(
-        verbose_name="Описание", help_text="Введите описание курса",
+        verbose_name="Описание",
+        help_text="Введите описание курса",
         blank=True,
         null=True,
     )
@@ -44,9 +46,12 @@ class Lesson(models.Model):
         blank=True, null=True, help_text="Введите описание урока"
     )
     preview = models.ImageField(
-        upload_to="lms/lessons_preview", verbose_name="Превью урока"
+        upload_to="lms/lessons_preview",
+        verbose_name="Превью урока",
+        blank=True,
+        null=True,
     )
-    video_url = models.URLField(verbose_name="Ссылка на видео")
+    video_url = models.URLField(verbose_name="Ссылка на видео", blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} (курс: {self.course.title})"
