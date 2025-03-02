@@ -3,8 +3,9 @@ from django.utils import timezone
 from users.models import Payment, User
 from lms.models import Course, Lesson
 
+
 class Command(BaseCommand):
-    help = 'Добавляет тестовые платежи в базу данных'
+    help = "Добавляет тестовые платежи в базу данных"
 
     def handle(self, *args, **kwargs):
         # Получаем первого и последнего пользователя
@@ -17,19 +18,19 @@ class Command(BaseCommand):
 
         # Проверяем, существуют ли необходимые объекты
         if not user1:
-            self.stdout.write(self.style.ERROR('Не найден первый пользователь'))
+            self.stdout.write(self.style.ERROR("Не найден первый пользователь"))
             return
 
         if not user2:
-            self.stdout.write(self.style.ERROR('Не найден последний пользователь'))
+            self.stdout.write(self.style.ERROR("Не найден последний пользователь"))
             return
 
         if not course1:
-            self.stdout.write(self.style.ERROR('Не найден первый курс'))
+            self.stdout.write(self.style.ERROR("Не найден первый курс"))
             return
 
         if not lesson1:
-            self.stdout.write(self.style.ERROR('Не найден первый урок'))
+            self.stdout.write(self.style.ERROR("Не найден первый урок"))
             return
 
         Payment.objects.create(
@@ -38,7 +39,7 @@ class Command(BaseCommand):
             course=course1,
             lesson=None,
             amount=1500.00,
-            payment_method='transfer'
+            payment_method="transfer",
         )
 
         Payment.objects.create(
@@ -47,7 +48,7 @@ class Command(BaseCommand):
             course=None,
             lesson=lesson1,
             amount=500.00,
-            payment_method='cash'
+            payment_method="cash",
         )
 
-        self.stdout.write(self.style.SUCCESS('Тестовые платежи успешно добавлены'))
+        self.stdout.write(self.style.SUCCESS("Тестовые платежи успешно добавлены"))
