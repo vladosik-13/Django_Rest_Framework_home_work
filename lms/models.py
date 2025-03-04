@@ -19,6 +19,12 @@ class Course(models.Model):
         blank=True,
         null=True,
     )
+    owner = models.ForeignKey(
+        "users.User",  # Используем строковое имя модели
+        on_delete=models.CASCADE,
+        related_name="courses",
+        verbose_name="Владелец",
+    )
 
     def __str__(self):
         return self.title
@@ -52,6 +58,12 @@ class Lesson(models.Model):
         null=True,
     )
     video_url = models.URLField(verbose_name="Ссылка на видео", blank=True, null=True)
+    owner = models.ForeignKey(
+        "users.User",  # Используем строковое имя модели
+        on_delete=models.CASCADE,
+        related_name="lessons",
+        verbose_name="Владелец",
+    )
 
     def __str__(self):
         return f"{self.title} (курс: {self.course.title})"
