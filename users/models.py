@@ -42,7 +42,7 @@ class Payment(models.Model):
     ]
 
     user = models.ForeignKey(
-        "users.User",  # Используем строковое имя модели
+        "users.User",
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
     )
@@ -55,7 +55,7 @@ class Payment(models.Model):
         verbose_name="Оплаченный курс",
     )
     lesson = models.ForeignKey(
-        "lms.Lesson",  # Используем строковое имя модели
+        "lms.Lesson",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -71,3 +71,26 @@ class Payment(models.Model):
     class Meta:
         verbose_name = "Платеж"
         verbose_name_plural = "Платежи"
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name="Пользователь"
+    )
+    course = models.ForeignKey(
+        'lms.Course',
+        on_delete=models.CASCADE,
+        related_name='subscribers',
+        verbose_name="Курс"
+    )
+
+    class Meta:
+        unique_together = ('user', 'course')
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+
+    def __str__(self):
+        return f"{self.user.email} subscribed to {self.course.title}"
