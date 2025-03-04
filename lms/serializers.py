@@ -1,5 +1,10 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import (
+    ModelSerializer,
+    SerializerMethodField,
+    ValidationError,
+)
 from lms.models import Course, Lesson
+from lms.validators import youtube_url_validator
 
 
 class LessonSerializer(ModelSerializer):
@@ -8,6 +13,11 @@ class LessonSerializer(ModelSerializer):
     class Meta:
         model = Lesson
         fields = "__all__"
+        extra_kwargs = {
+            "video_url": {
+                "validators": [youtube_url_validator]
+            }  # Интеграция валидатора
+        }
 
     def get_owner_email(self, obj):
         return obj.owner.email
