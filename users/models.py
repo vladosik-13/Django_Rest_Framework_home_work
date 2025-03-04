@@ -75,20 +75,20 @@ class Payment(models.Model):
 
 class Subscription(models.Model):
     user = models.ForeignKey(
-        'users.User',
+        "users.User",
         on_delete=models.CASCADE,
-        related_name='subscriptions',
-        verbose_name="Пользователь"
+        related_name="subscriptions",
+        verbose_name="Пользователь",
     )
     course = models.ForeignKey(
-        'lms.Course',
+        "lms.Course",
         on_delete=models.CASCADE,
-        related_name='subscribers',
-        verbose_name="Курс"
+        related_name="subscribers",
+        verbose_name="Курс",
     )
 
     class Meta:
-        unique_together = ('user', 'course')
+        unique_together = ("user", "course")
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
 

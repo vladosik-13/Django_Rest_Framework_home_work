@@ -41,6 +41,11 @@ class CourseViewSet(ModelViewSet):
             return Course.objects.all()
         return Course.objects.filter(owner=self.request.user)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
 
 class LessonCreateAPIView(CreateAPIView):
     queryset = Lesson.objects.all()

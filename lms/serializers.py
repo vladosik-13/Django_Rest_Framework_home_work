@@ -1,4 +1,8 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, ValidationError
+from rest_framework.serializers import (
+    ModelSerializer,
+    SerializerMethodField,
+    ValidationError,
+)
 from lms.models import Course, Lesson
 from lms.validators import youtube_url_validator
 from django.shortcuts import get_object_or_404
@@ -7,6 +11,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class LessonSerializer(ModelSerializer):
     owner_email = SerializerMethodField()
 
@@ -14,11 +19,14 @@ class LessonSerializer(ModelSerializer):
         model = Lesson
         fields = "__all__"
         extra_kwargs = {
-            'video_url': {'validators': [youtube_url_validator]}  # Интеграция валидатора
+            "video_url": {
+                "validators": [youtube_url_validator]
+            }  # Интеграция валидатора
         }
 
     def get_owner_email(self, obj):
         return obj.owner.email
+
 
 class CourseSerializer(ModelSerializer):
     owner_email = SerializerMethodField()
@@ -32,10 +40,11 @@ class CourseSerializer(ModelSerializer):
         return obj.owner.email
 
     def get_is_subscribed(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         if user.is_authenticated:
             return obj.subscribers.filter(user=user).exists()
         return False
+
 
 class CourseDetailSerializer(ModelSerializer):
     count_lessons_in_course = SerializerMethodField()
@@ -67,7 +76,7 @@ class CourseDetailSerializer(ModelSerializer):
         return obj.owner.email
 
     def get_is_subscribed(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         if user.is_authenticated:
             return obj.subscribers.filter(user=user).exists()
         return False
