@@ -1,7 +1,6 @@
-import unittest
-from django.test import TestCase, Client
-from django.urls import reverse
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from .models import Course, Lesson
 from users.models import Subscription
@@ -10,9 +9,9 @@ from django.contrib.auth.models import Group
 User = get_user_model()
 
 
-class LessonCRUDTests(TestCase):
+class LessonCRUDTests(APITestCase):
     def setUp(self):
-        self.client = Client()
+        self.client = APIClient()
         self.admin_user = User.objects.create_superuser(
             email="admin@example.com", password="adminpassword"
         )
@@ -40,7 +39,7 @@ class LessonCRUDTests(TestCase):
         )
 
     def test_create_lesson_as_admin(self):
-        self.client.login(email="admin@example.com", password="adminpassword")
+        self.client.force_authenticate(user=self.admin_user)
         url = reverse("lms:lesson_create")
         data = {
             "course": self.course.id,
@@ -48,12 +47,12 @@ class LessonCRUDTests(TestCase):
             "description": "New Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=newlesson",
         }
-        response = self.client.post(url, data, content_type="application/json")
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Lesson.objects.count(), 2)
 
     def test_create_lesson_as_moderator(self):
-        self.client.login(email="moderator@example.com", password="moderatorpassword")
+        self.client.force_authenticate(user=self.moderator_user)
         url = reverse("lms:lesson_create")
         data = {
             "course": self.course.id,
@@ -61,12 +60,12 @@ class LessonCRUDTests(TestCase):
             "description": "New Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=newlesson",
         }
-        response = self.client.post(url, data, content_type="application/json")
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Lesson.objects.count(), 1)
 
     def test_create_lesson_as_regular_user(self):
-        self.client.login(email="user@example.com", password="userpassword")
+        self.client.force_authenticate(user=self.regular_user)
         url = reverse("lms:lesson_create")
         data = {
             "course": self.course.id,
@@ -74,7 +73,7 @@ class LessonCRUDTests(TestCase):
             "description": "New Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=newlesson",
         }
-        response = self.client.post(url, data, content_type="application/json")
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Lesson.objects.count(), 1)
 
@@ -86,12 +85,12 @@ class LessonCRUDTests(TestCase):
             "description": "New Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=newlesson",
         }
-        response = self.client.post(url, data, content_type="application/json")
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(Lesson.objects.count(), 1)
 
     def test_update_lesson_as_admin(self):
-        self.client.login(email="admin@example.com", password="adminpassword")
+        self.client.force_authenticate(user=self.admin_user)
         url = reverse("lms:lesson_update", kwargs={"pk": self.lesson.id})
         data = {
             "course": self.course.id,
@@ -99,13 +98,13 @@ class LessonCRUDTests(TestCase):
             "description": "Updated Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=updatedlesson",
         }
-        response = self.client.put(url, data, content_type="application/json")
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lesson.refresh_from_db()
         self.assertEqual(self.lesson.title, "Updated Lesson")
 
     def test_update_lesson_as_moderator(self):
-        self.client.login(email="moderator@example.com", password="moderatorpassword")
+        self.client.force_authenticate(user=self.moderator_user)
         url = reverse("lms:lesson_update", kwargs={"pk": self.lesson.id})
         data = {
             "course": self.course.id,
@@ -113,13 +112,13 @@ class LessonCRUDTests(TestCase):
             "description": "Updated Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=updatedlesson",
         }
-        response = self.client.put(url, data, content_type="application/json")
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lesson.refresh_from_db()
         self.assertEqual(self.lesson.title, "Updated Lesson")
 
     def test_update_lesson_as_owner(self):
-        self.client.login(email="user@example.com", password="userpassword")
+        self.client.force_authenticate(user=self.regular_user)
         self.lesson.owner = self.regular_user
         self.lesson.save()
         url = reverse("lms:lesson_update", kwargs={"pk": self.lesson.id})
@@ -129,13 +128,13 @@ class LessonCRUDTests(TestCase):
             "description": "Updated Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=updatedlesson",
         }
-        response = self.client.put(url, data, content_type="application/json")
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lesson.refresh_from_db()
         self.assertEqual(self.lesson.title, "Updated Lesson")
 
     def test_update_lesson_as_non_owner(self):
-        self.client.login(email="anotheruser@example.com", password="anotherpassword")
+        self.client.force_authenticate(user=self.another_user)
         url = reverse("lms:lesson_update", kwargs={"pk": self.lesson.id})
         data = {
             "course": self.course.id,
@@ -143,27 +142,27 @@ class LessonCRUDTests(TestCase):
             "description": "Updated Lesson Description",
             "video_url": "https://www.youtube.com/watch?v=updatedlesson",
         }
-        response = self.client.put(url, data, content_type="application/json")
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.lesson.refresh_from_db()
         self.assertNotEqual(self.lesson.title, "Updated Lesson")
 
     def test_delete_lesson_as_admin(self):
-        self.client.login(email="admin@example.com", password="adminpassword")
+        self.client.force_authenticate(user=self.admin_user)
         url = reverse("lms:lesson_delete", kwargs={"pk": self.lesson.id})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Lesson.objects.count(), 0)
 
     def test_delete_lesson_as_moderator(self):
-        self.client.login(email="moderator@example.com", password="moderatorpassword")
+        self.client.force_authenticate(user=self.moderator_user)
         url = reverse("lms:lesson_delete", kwargs={"pk": self.lesson.id})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Lesson.objects.count(), 1)
 
     def test_delete_lesson_as_owner(self):
-        self.client.login(email="user@example.com", password="userpassword")
+        self.client.force_authenticate(user=self.regular_user)
         self.lesson.owner = self.regular_user
         self.lesson.save()
         url = reverse("lms:lesson_delete", kwargs={"pk": self.lesson.id})
@@ -172,21 +171,21 @@ class LessonCRUDTests(TestCase):
         self.assertEqual(Lesson.objects.count(), 0)
 
     def test_delete_lesson_as_non_owner(self):
-        self.client.login(email="anotheruser@example.com", password="anotherpassword")
+        self.client.force_authenticate(user=self.another_user)
         url = reverse("lms:lesson_delete", kwargs={"pk": self.lesson.id})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Lesson.objects.count(), 1)
 
     def test_list_lessons(self):
-        self.client.login(email="user@example.com", password="userpassword")
+        self.client.force_authenticate(user=self.regular_user)
         url = reverse("lms:lesson_list")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_retrieve_lesson(self):
-        self.client.login(email="user@example.com", password="userpassword")
+        self.client.force_authenticate(user=self.regular_user)
         url = reverse("lms:lesson_retrieve", kwargs={"pk": self.lesson.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
