@@ -1,13 +1,9 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
-
+from rest_framework.permissions import BasePermission
 
 class IsOwner(BasePermission):
     """
-    Allows access only to owners of an object.
+    Custom permission to only allow owners of an object to edit it.
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS:
-            return True
-
         return obj.owner == request.user
