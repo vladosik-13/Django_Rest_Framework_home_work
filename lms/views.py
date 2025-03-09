@@ -41,6 +41,11 @@ class CourseViewSet(ModelViewSet):
             return Course.objects.all()
         return Course.objects.filter(owner=self.request.user)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
 
 class LessonCreateAPIView(CreateAPIView):
     queryset = Lesson.objects.all()
@@ -74,7 +79,7 @@ class LessonRetrieveAPIView(RetrieveAPIView):
 class LessonUpdateAPIView(UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAdminUser | IsModerator | IsOwner]
+    permission_classes = [IsAdminUser | IsOwner]
 
     def get_queryset(self):
         if (
@@ -88,7 +93,7 @@ class LessonUpdateAPIView(UpdateAPIView):
 class LessonDestroyAPIView(DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser | IsOwner]
 
     def get_queryset(self):
         if (
@@ -97,3 +102,4 @@ class LessonDestroyAPIView(DestroyAPIView):
         ):
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=self.request.user)
+

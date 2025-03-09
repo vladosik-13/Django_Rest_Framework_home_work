@@ -1,5 +1,7 @@
 from django.db import models
 
+from lms.validators import youtube_url_validator
+
 
 class Course(models.Model):
     title = models.CharField(
@@ -20,7 +22,7 @@ class Course(models.Model):
         null=True,
     )
     owner = models.ForeignKey(
-        "users.User",  # Используем строковое имя модели
+        "users.User",
         on_delete=models.CASCADE,
         related_name="courses",
         verbose_name="Владелец",
@@ -57,9 +59,14 @@ class Lesson(models.Model):
         blank=True,
         null=True,
     )
-    video_url = models.URLField(verbose_name="Ссылка на видео", blank=True, null=True)
+    video_url = models.URLField(
+        verbose_name="Ссылка на видео",
+        blank=True,
+        null=True,
+        validators=[youtube_url_validator],
+    )
     owner = models.ForeignKey(
-        "users.User",  # Используем строковое имя модели
+        "users.User",
         on_delete=models.CASCADE,
         related_name="lessons",
         verbose_name="Владелец",
