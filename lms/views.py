@@ -1,20 +1,11 @@
-from rest_framework.generics import (
-    CreateAPIView,
-    DestroyAPIView,
-    ListAPIView,
-    RetrieveAPIView,
-    UpdateAPIView,
-)
-from rest_framework.viewsets import ModelViewSet
+from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from users.permissions import IsModerator
 from lms.permissions import IsOwner
-
 from lms.models import Course, Lesson
 from lms.serializers import CourseSerializer, LessonSerializer, CourseDetailSerializer
 
-
-class CourseViewSet(ModelViewSet):
+class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     permission_classes = [IsAuthenticated]
 
@@ -34,20 +25,16 @@ class CourseViewSet(ModelViewSet):
         serializer.save(owner=self.request.user)
 
     def get_queryset(self):
-        if (
-            self.request.user.is_superuser
-            or self.request.user.groups.filter(name="Moderators").exists()
-        ):
-            return Course.objects.all()
-        return Course.objects.filter(owner=self.request.user)
+        if self.request.user.is_authenticated:
+            if (
+                self.request.user.is_superuser
+                or self.request.user.groups.filter(name="Moderators").exists()
+            ):
+                return Course.objects.all()
+            return Course.objects.filter(owner=self.request.user)
+        return Course.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["request"] = self.request
-        return context
-
-
-class LessonCreateAPIView(CreateAPIView):
+class LessonCreateAPIView(generics.CreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAdminUser]
@@ -55,51 +42,52 @@ class LessonCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-
-class LessonListAPIView(ListAPIView):
+class LessonListAPIView(generics.ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if (
-            self.request.user.is_superuser
-            or self.request.user.groups.filter(name="Moderators").exists()
-        ):
-            return Lesson.objects.all()
-        return Lesson.objects.filter(owner=self.request.user)
+        if self.request.user.is_authenticated:
+            if (
+                self.request.user.is_superuser
+                or self.request.user.groups.filter(name="Moderators").exists()
+            ):
+                return Lesson.objects.all()
+            return Lesson.objects.filter(owner=self.request.user)
+        return Lesson.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей
 
-
-class LessonRetrieveAPIView(RetrieveAPIView):
+class LessonRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
 
-
-class LessonUpdateAPIView(UpdateAPIView):
+class LessonUpdateAPIView(generics.UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAdminUser | IsOwner]
 
     def get_queryset(self):
-        if (
-            self.request.user.is_superuser
-            or self.request.user.groups.filter(name="Moderators").exists()
-        ):
-            return Lesson.objects.all()
-        return Lesson.objects.filter(owner=self.request.user)
+        if self.request.user.is_authenticated:
+            if (
+                self.request.user.is_superuser
+                or self.request.user.groups.filter(name="Moderators").exists()
+            ):
+                return Lesson.objects.all()
+            return Lesson.objects.filter(owner=self.request.user)
+        return Lesson.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей
 
-
-class LessonDestroyAPIView(DestroyAPIView):
+class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAdminUser | IsOwner]
 
     def get_queryset(self):
-        if (
-            self.request.user.is_superuser
-            or self.request.user.groups.filter(name="Moderators").exists()
-        ):
-            return Lesson.objects.all()
-        return Lesson.objects.filter(owner=self.request.user)
-
+        if self.request.user.is_authenticated:
+            if (
+                self.request.user.is_superuser
+                or self.request.user.groups.filter(name="Moderators").exists()
+            ):
+                return Lesson.objects.all()
+            return Lesson.objects.filter(owner=self.request.user)
+        return Lesson.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей

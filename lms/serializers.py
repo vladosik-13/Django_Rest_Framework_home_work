@@ -1,19 +1,12 @@
-from rest_framework.serializers import (
-    ModelSerializer,
-    SerializerMethodField,
-    ValidationError,
-)
+from rest_framework import serializers
 from lms.models import Course, Lesson
 from lms.validators import youtube_url_validator
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
-class LessonSerializer(ModelSerializer):
-    owner_email = SerializerMethodField()
+class LessonSerializer(serializers.ModelSerializer):
+    owner_email = serializers.SerializerMethodField()
 
     class Meta:
         model = Lesson
@@ -21,20 +14,21 @@ class LessonSerializer(ModelSerializer):
         extra_kwargs = {
             "video_url": {
                 "validators": [youtube_url_validator]
-            }  # Интеграция валидатора
+            }
         }
+        ref_name = 'LessonSerializer_LMS'  # Уникальное имя для сериализатора
 
     def get_owner_email(self, obj):
         return obj.owner.email
 
-
-class CourseSerializer(ModelSerializer):
-    owner_email = SerializerMethodField()
-    is_subscribed = SerializerMethodField()
+class CourseSerializer(serializers.ModelSerializer):
+    owner_email = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = "__all__"
+        ref_name = 'CourseSerializer_LMS'  # Уникальное имя для сериализатора
 
     def get_owner_email(self, obj):
         return obj.owner.email
@@ -45,12 +39,11 @@ class CourseSerializer(ModelSerializer):
             return obj.subscribers.filter(user=user).exists()
         return False
 
-
-class CourseDetailSerializer(ModelSerializer):
-    count_lessons_in_course = SerializerMethodField()
-    lessons = SerializerMethodField()
-    owner_email = SerializerMethodField()
-    is_subscribed = SerializerMethodField()
+class CourseDetailSerializer(serializers.ModelSerializer):
+    count_lessons_in_course = serializers.SerializerMethodField()
+    lessons = serializers.SerializerMethodField()
+    owner_email = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -64,6 +57,7 @@ class CourseDetailSerializer(ModelSerializer):
             "owner_email",
             "is_subscribed",
         )
+        ref_name = 'CourseDetailSerializer_LMS'  # Уникальное имя для сериализатора
 
     def get_count_lessons_in_course(self, course):
         return course.lesson_set.count()
