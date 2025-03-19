@@ -12,7 +12,10 @@ class LessonCRUDTests(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.admin_user = User.objects.create_user(
-            email="admin@example.com", password="adminpassword", is_staff=True, is_superuser=True
+            email="admin@example.com",
+            password="adminpassword",
+            is_staff=True,
+            is_superuser=True,
         )
         self.moderator_user = User.objects.create_user(
             email="moderator@example.com", password="moderatorpassword"
