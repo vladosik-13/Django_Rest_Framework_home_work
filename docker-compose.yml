@@ -5,7 +5,7 @@ services:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/code
+      - .:/app
       - static_volume:/code/static
     ports:
       - "8000:8000"
@@ -31,9 +31,9 @@ services:
 
   celery:
     build: .
-    command: celery -A your_project_name worker --loglevel=info
+    command: celery -A Django_Rest_Framework worker --loglevel=info
     volumes:
-      - .:/code
+      - .:/app
     depends_on:
       - db
       - redis
@@ -42,9 +42,9 @@ services:
 
   celery-beat:
     build: .
-    command: celery -A your_project_name beat --loglevel=info
+    command: celery -A Django_Rest_Framework beat --loglevel=info
     volumes:
-      - .:/code
+      - .:/app
     depends_on:
       - db
       - redis
