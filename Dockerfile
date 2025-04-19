@@ -9,6 +9,7 @@ COPY . .
 
 ENV DATABASE_URL=postgres://postgres:Zaluap123@db:5432/lms
 ENV SECRET_KEY="django-insecure-!_tdv89&5hdv250=1(jo5ww_olu!lgdx=3zwee8tw5(a_yc2*1"
+ENV DJANGO_SETTINGS_MODULE=config.settings
 ENV DEBUG=False
 
 EXPOSE 8000
