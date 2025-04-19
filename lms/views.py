@@ -4,6 +4,8 @@ from users.permissions import IsModerator
 from lms.permissions import IsOwner
 from lms.models import Course, Lesson
 from lms.serializers import CourseSerializer, LessonSerializer, CourseDetailSerializer
+from lms.tasks import send_course_update_emails
+
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -24,6 +26,10 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    def perform_update(self, serializer):
+        super().perform_update(serializer)
+        send_course_update_emails.delay(serializer.instance.id)  # Вызов задачи отправки писем
+
     def get_queryset(self):
         if self.request.user.is_authenticated:
             if (
@@ -42,6 +48,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+
 class LessonListAPIView(generics.ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
@@ -55,12 +62,16 @@ class LessonListAPIView(generics.ListAPIView):
             ):
                 return Lesson.objects.all()
             return Lesson.objects.filter(owner=self.request.user)
-        return Lesson.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей
+        return (
+            Lesson.objects.none()
+        )  # Возвращаем пустой QuerySet для анонимных пользователей
+
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
+
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
     queryset = Lesson.objects.all()
@@ -75,7 +86,10 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
             ):
                 return Lesson.objects.all()
             return Lesson.objects.filter(owner=self.request.user)
-        return Lesson.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей
+        return (
+            Lesson.objects.none()
+        )  # Возвращаем пустой QuerySet для анонимных пользователей
+
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
@@ -90,4 +104,6 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
             ):
                 return Lesson.objects.all()
             return Lesson.objects.filter(owner=self.request.user)
-        return Lesson.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей
+        return (
+            Lesson.objects.none()
+        )  # Возвращаем пустой QuerySet для анонимных пользователей

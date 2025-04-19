@@ -2,12 +2,13 @@ from rest_framework import serializers
 from .models import Payment, User
 from lms.models import Course, Lesson
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email", "first_name", "last_name", "password"]
         extra_kwargs = {"password": {"write_only": True}}
-        ref_name = 'UserSerializer_Users'  # Уникальное имя для сериализатора
+        ref_name = "UserSerializer_Users"  # Уникальное имя для сериализатора
 
     def create(self, validated_data):
         user = User(
@@ -19,17 +20,20 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ["id", "title"]
-        ref_name = 'CourseSerializer_Users'  # Уникальное имя для сериализатора
+        ref_name = "CourseSerializer_Users"  # Уникальное имя для сериализатора
+
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = ["id", "title"]
-        ref_name = 'LessonSerializer_Users'  # Уникальное имя для сериализатора
+        ref_name = "LessonSerializer_Users"  # Уникальное имя для сериализатора
+
 
 class PaymentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -39,4 +43,4 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = "__all__"
-        ref_name = 'PaymentSerializer_Users'  # Уникальное имя для сериализатора
+        ref_name = "PaymentSerializer_Users"  # Уникальное имя для сериализатора

@@ -74,11 +74,23 @@ class Payment(models.Model):
         max_length=10, choices=PAYMENT_METHOD_CHOICES, verbose_name="Способ оплаты"
     )
     payment_status = models.CharField(
-        max_length=10, choices=PAYMENT_STATUS_CHOICES, default="pending", verbose_name="Статус оплаты"
+        max_length=10,
+        choices=PAYMENT_STATUS_CHOICES,
+        default="pending",
+        verbose_name="Статус оплаты",
     )
-    stripe_session_id = models.CharField(max_length=255, null=True, blank=True, verbose_name="ID сессии Stripe")
-    stripe_payment_intent_id = models.CharField(max_length=255, null=True, blank=True, verbose_name="ID намерения платежа Stripe")
-    stripe_checkout_url = models.URLField(null=True, blank=True, verbose_name="URL для оплаты Stripe")
+    stripe_session_id = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name="ID сессии Stripe"
+    )
+    stripe_payment_intent_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="ID намерения платежа Stripe",
+    )
+    stripe_checkout_url = models.URLField(
+        null=True, blank=True, verbose_name="URL для оплаты Stripe"
+    )
 
     class Meta:
         verbose_name = "Платеж"

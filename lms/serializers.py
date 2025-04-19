@@ -5,21 +5,19 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class LessonSerializer(serializers.ModelSerializer):
     owner_email = serializers.SerializerMethodField()
 
     class Meta:
         model = Lesson
         fields = "__all__"
-        extra_kwargs = {
-            "video_url": {
-                "validators": [youtube_url_validator]
-            }
-        }
-        ref_name = 'LessonSerializer_LMS'  # Уникальное имя для сериализатора
+        extra_kwargs = {"video_url": {"validators": [youtube_url_validator]}}
+        ref_name = "LessonSerializer_LMS"  # Уникальное имя для сериализатора
 
     def get_owner_email(self, obj):
         return obj.owner.email
+
 
 class CourseSerializer(serializers.ModelSerializer):
     owner_email = serializers.SerializerMethodField()
@@ -28,7 +26,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = "__all__"
-        ref_name = 'CourseSerializer_LMS'  # Уникальное имя для сериализатора
+        ref_name = "CourseSerializer_LMS"  # Уникальное имя для сериализатора
 
     def get_owner_email(self, obj):
         return obj.owner.email
@@ -38,6 +36,7 @@ class CourseSerializer(serializers.ModelSerializer):
         if user.is_authenticated:
             return obj.subscribers.filter(user=user).exists()
         return False
+
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     count_lessons_in_course = serializers.SerializerMethodField()
@@ -57,7 +56,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             "owner_email",
             "is_subscribed",
         )
-        ref_name = 'CourseDetailSerializer_LMS'  # Уникальное имя для сериализатора
+        ref_name = "CourseDetailSerializer_LMS"  # Уникальное имя для сериализатора
 
     def get_count_lessons_in_course(self, course):
         return course.lesson_set.count()
