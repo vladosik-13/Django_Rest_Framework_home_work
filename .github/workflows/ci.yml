@@ -36,7 +36,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v2
+        uses: docker/setup-compose-action@v2.5.0
 
       - name: Install dependencies
         run: |
