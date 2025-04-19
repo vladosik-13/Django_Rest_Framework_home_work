@@ -1,11 +1,17 @@
 import os
-import sys
 from datetime import timedelta
 from pathlib import Path
 from .celery_beat_schedule import BEAT_SCHEDULE  # Импортируем BEAT_SCHEDULE
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Вывод значений переменных окружения для отладки
+print(f"NAME: {os.getenv('NAME')}")
+print(f"USER: {os.getenv('USER')}")
+print(f"PASSWORD: {os.getenv('PASSWORD')}")
+print(f"HOST: {os.getenv('HOST')}")
+print(f"PORT: {os.getenv('PORT')}")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -191,12 +197,3 @@ EMAIL_PORT = os.getenv("EMAIL_PORT", 587)
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", True)
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "your-email@example.com")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "your-email-password")
-
-
-if "test" in sys.argv:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
