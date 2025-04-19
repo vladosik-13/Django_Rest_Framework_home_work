@@ -40,13 +40,36 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Tests
-        run: python manage.py test
-
       - name: Set environment variables
         run: |
           echo "DJANGO_SETTINGS_MODULE=config.settings" >> $GITHUB_ENV
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+          echo "NAME=lms" >> $GITHUB_ENV
+          echo "USER=postgres" >> $GITHUB_ENV
+          echo "PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> $GITHUB_ENV
+          echo "HOST=db" >> $GITHUB_ENV
+          echo "PORT=5432" >> $GITHUB_ENV
+          echo "REDIS_HOST=redis" >> $GITHUB_ENV
+          echo "REDIS_PORT=6379" >> $GITHUB_ENV
+          echo "STRIPE_PUBLIC_KEY=${{ secrets.STRIPE_PUBLIC_KEY }}" >> $GITHUB_ENV
+          echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> $GITHUB_ENV
+
+      - name: Print environment variables for debugging
+        run: |
+          echo "DJANGO_SETTINGS_MODULE: $DJANGO_SETTINGS_MODULE"
+          echo "SECRET_KEY: $SECRET_KEY"
+          echo "NAME: $NAME"
+          echo "USER: $USER"
+          echo "PASSWORD: $PASSWORD"
+          echo "HOST: $HOST"
+          echo "PORT: $PORT"
+          echo "REDIS_HOST: $REDIS_HOST"
+          echo "REDIS_PORT: $REDIS_PORT"
+          echo "STRIPE_PUBLIC_KEY: $STRIPE_PUBLIC_KEY"
+          echo "STRIPE_SECRET_KEY: $STRIPE_SECRET_KEY"
+
+      - name: Run Tests
+        run: python manage.py test
 
   build:
     needs: test
