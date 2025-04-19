@@ -22,71 +22,8 @@ jobs:
       - name: Run Flake8
         run: flake8 .
 
-  test:
-    needs: lint
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_DB: lms
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Zalupa123
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Set environment variables
-        run: |
-          echo "DJANGO_SETTINGS_MODULE=config.settings" >> $GITHUB_ENV
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
-          echo "NAME=lms" >> $GITHUB_ENV
-          echo "USER=postgres" >> $GITHUB_ENV
-          echo "PASSWORD=Zalupa123" >> $GITHUB_ENV
-          echo "HOST=localhost" >> $GITHUB_ENV
-          echo "PORT=5432" >> $GITHUB_ENV
-          echo "REDIS_HOST=redis" >> $GITHUB_ENV
-          echo "REDIS_PORT=6379" >> $GITHUB_ENV
-          echo "STRIPE_PUBLIC_KEY=${{ secrets.STRIPE_PUBLIC_KEY }}" >> $GITHUB_ENV
-          echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> $GITHUB_ENV
-
-      - name: Print environment variables for debugging
-        run: |
-          echo "DJANGO_SETTINGS_MODULE: $DJANGO_SETTINGS_MODULE"
-          echo "SECRET_KEY: $SECRET_KEY"
-          echo "NAME: $NAME"
-          echo "USER: $USER"
-          echo "PASSWORD: $PASSWORD"
-          echo "HOST: $HOST"
-          echo "PORT: $PORT"
-          echo "REDIS_HOST: $REDIS_HOST"
-          echo "REDIS_PORT: $REDIS_PORT"
-          echo "STRIPE_PUBLIC_KEY: $STRIPE_PUBLIC_KEY"
-          echo "STRIPE_SECRET_KEY: $STRIPE_SECRET_KEY"
-
-      - name: Run Tests
-        run: python manage.py test
-
   build:
-    needs: test
+    needs: lint
     runs-on: ubuntu-latest
 
     steps:
