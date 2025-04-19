@@ -25,6 +25,20 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: lms
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: Zalupa123
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Check out code
@@ -46,8 +60,8 @@ jobs:
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
           echo "NAME=lms" >> $GITHUB_ENV
           echo "USER=postgres" >> $GITHUB_ENV
-          echo "PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> $GITHUB_ENV
-          echo "HOST=db" >> $GITHUB_ENV
+          echo "PASSWORD=Zalupa123" >> $GITHUB_ENV
+          echo "HOST=localhost" >> $GITHUB_ENV
           echo "PORT=5432" >> $GITHUB_ENV
           echo "REDIS_HOST=redis" >> $GITHUB_ENV
           echo "REDIS_PORT=6379" >> $GITHUB_ENV
@@ -67,6 +81,9 @@ jobs:
           echo "REDIS_PORT: $REDIS_PORT"
           echo "STRIPE_PUBLIC_KEY: $STRIPE_PUBLIC_KEY"
           echo "STRIPE_SECRET_KEY: $STRIPE_SECRET_KEY"
+
+      - name: Apply migrations
+        run: python manage.py migrate
 
       - name: Run Tests
         run: python manage.py test
