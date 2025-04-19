@@ -1,7 +1,5 @@
 import stripe
 from django.conf import settings
-from lms.models import Course
-from users.models import Payment
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY

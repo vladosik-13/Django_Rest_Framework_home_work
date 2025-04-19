@@ -5,6 +5,7 @@ from datetime import timedelta
 
 User = get_user_model()
 
+
 @shared_task
 def deactivate_inactive_users():
     one_month_ago = timezone.now() - timedelta(days=30)

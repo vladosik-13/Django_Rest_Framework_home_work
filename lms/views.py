@@ -28,7 +28,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         super().perform_update(serializer)
-        send_course_update_emails.delay(serializer.instance.id)  # Вызов задачи отправки писем
+        send_course_update_emails.delay(
+            serializer.instance.id
+        )  # Вызов задачи отправки писем
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
@@ -38,7 +40,10 @@ class CourseViewSet(viewsets.ModelViewSet):
             ):
                 return Course.objects.all()
             return Course.objects.filter(owner=self.request.user)
-        return Course.objects.none()  # Возвращаем пустой QuerySet для анонимных пользователей
+        return (
+            Course.objects.none()
+        )  # Возвращаем пустой QuerySet для анонимных пользователей
+
 
 class LessonCreateAPIView(generics.CreateAPIView):
     queryset = Lesson.objects.all()
