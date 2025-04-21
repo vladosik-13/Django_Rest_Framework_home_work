@@ -16,7 +16,7 @@ jobs:
 
       - name: Install flake8
         run: |
-          python pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install flake8
 
       - name: Run Flake8
@@ -25,9 +25,8 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
-
     steps:
-      - name: Chek out code
+      - name: Check out code
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -35,35 +34,33 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Instal dependencies
+      - name: Install dependencies
         run: |
-          python pip install --upgrade pip
-          pip install requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Используйте -r вместо -m
 
       - name: Run Tests
-        run: python manage.py tests
+        run: python manage.py test  # Исправьте команду на python manage.py test
 
   build:
     needs: test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Chek out code
+      - name: Check out code
         uses: actions/checkout@v3
 
-      - name: log in Docker hub
-        run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN}} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
-      - name: Build Dpcker image
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+      - name: Build Docker image
+        run: docker build -t "${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}" .
 
-      - name: Push Docker image in Docker hub
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+      - name: Push Docker image to Docker Hub
+        run: docker push "${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}"
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
     steps:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -72,7 +69,7 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyCheking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
           docker stop myapp || true
           docker rm myapp || true
