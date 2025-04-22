@@ -1,17 +1,18 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update
+RUN apt-get -y install libpq-dev gcc
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+COPY poetry.lock pyproject.toml ./
+RUN pip install poetry --no-cache-dir
+RUN poetry install --no-root
 
 COPY . .
 
-ENV DATABASE_URL=postgres://postgres:Zaluap123@db:5432/lms
-ENV SECRET_KEY="django-insecure-!_tdv89&5hdv250=1(jo5ww_olu!lgdx=3zwee8tw5(a_yc2*1"
-ENV DJANGO_SETTINGS_MODULE=config.settings
-ENV DEBUG=False
-
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
