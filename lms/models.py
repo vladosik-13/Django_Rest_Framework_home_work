@@ -1,5 +1,7 @@
 from django.db import models
 
+from lms.validators import youtube_url_validator
+
 
 class Course(models.Model):
     title = models.CharField(
@@ -18,6 +20,12 @@ class Course(models.Model):
         help_text="Введите описание курса",
         blank=True,
         null=True,
+    )
+    owner = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="courses",
+        verbose_name="Владелец",
     )
 
     def __str__(self):
@@ -51,7 +59,18 @@ class Lesson(models.Model):
         blank=True,
         null=True,
     )
-    video_url = models.URLField(verbose_name="Ссылка на видео", blank=True, null=True)
+    video_url = models.URLField(
+        verbose_name="Ссылка на видео",
+        blank=True,
+        null=True,
+        validators=[youtube_url_validator],
+    )
+    owner = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="lessons",
+        verbose_name="Владелец",
+    )
 
     def __str__(self):
         return f"{self.title} (курс: {self.course.title})"
